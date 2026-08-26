@@ -37,20 +37,23 @@ curl http://localhost:8000/health
 
 Docker is optional. Participants whose computers do not support virtualization can run the same workshop app in a Python virtual environment. This mode uses an in-process knowledge index, so Qdrant and Docker are not required.
 
-From PowerShell in the repository root:
+Install Python 3.11 or newer first and select **Add Python to PATH** during installation. Then open **Windows PowerShell** (not Command Prompt), change to the cloned repository directory, and run:
 
 ```powershell
+cd "C:\path\to\jid-rag-training"
+Set-ExecutionPolicy -Scope Process Bypass
 .\scripts\setup-venv.ps1
 .\scripts\run-venv.ps1
 ```
 
-If Windows blocks local PowerShell scripts, allow them for only the current terminal and retry:
+`Set-ExecutionPolicy -Scope Process Bypass` applies only to the current PowerShell window; it does not permanently change the computer's execution policy. The setup script creates `.env` from `.env.example` when needed, creates `backend\.venv`, and installs the required packages.
+
+Then open <http://localhost:8000>. Stop the server with `Ctrl+C`. For later sessions, open PowerShell in the repository and run only:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
+.\scripts\run-venv.ps1
 ```
-
-The setup script also creates `.env` from `.env.example` when it is missing. Then open <http://localhost:8000>. Stop the server with `Ctrl+C`. Run `setup-venv.ps1` only once; use `run-venv.ps1` for later sessions.
 
 The virtual-environment launcher sets `QDRANT_URL=memory://` and points `KNOWLEDGE_PATH` at the repository's `knowledge` directory for the current process only. Existing `.env` settings— including demo mode and optional provider credentials—continue to apply. Restarting the app rebuilds its in-memory index automatically.
 
