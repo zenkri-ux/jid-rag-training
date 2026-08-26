@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+import logging
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
@@ -14,6 +15,7 @@ from app.rag.retriever import QdrantRetriever
 from app.ui import INDEX_HTML
 
 
+logger = logging.getLogger(__name__)
 settings = get_settings()
 embeddings = EmbeddingClient(settings)
 retriever = QdrantRetriever(settings, embeddings)
@@ -53,7 +55,8 @@ async def chat(request: ChatRequest) -> dict:
     try:
         return await orchestrator.chat(request.message, request.conversation_id, request.stage)
     except Exception as exc:
-        raise HTTPException(status_code=503, detail=f"Assistant dependency unavailable: {exc}") from exc
+        logger.exception("Assistant dependency unavailable")
+        raise HTTPException(status_code=503, detail="Assistant dependency unavailable.") from exc
 
 
 @app.post("/knowledge/reindex")
@@ -62,7 +65,8 @@ async def reindex() -> dict[str, int | str]:
         count = await rebuild_index(settings, retriever)
         return {"status": "indexed", "chunks": count}
     except Exception as exc:
-        raise HTTPException(status_code=503, detail=f"Indexing failed: {exc}") from exc
+        logger.exception("Knowledge indexing failed")
+        raise HTTPException(status_code=503, detail="Knowledge indexing failed.") from exc
 
 
 @app.get("/debug/retrieval")
@@ -70,7 +74,8 @@ async def debug_retrieval(q: str = Query(min_length=2), limit: int = Query(defau
     try:
         results = await retriever.search(q, limit=limit)
     except Exception as exc:
-        raise HTTPException(status_code=503, detail=f"Retrieval failed: {exc}") from exc
+        logger.exception("Retrieval failed")
+        raise HTTPException(status_code=503, detail="Retrieval failed.") from exc
     return {
         "query": q,
         "results": [

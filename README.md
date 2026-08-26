@@ -65,6 +65,12 @@ docker compose down -v  # also resets the Qdrant index
 
 The API contract is visible at <http://localhost:8000/docs>. Workshop participants should start here; instructor explanations and solutions live separately under `training/instructor/` and should be distributed on an instructor-only branch.
 
+## Security boundary
+
+This is a local workshop application, not a production deployment. Docker Compose binds the API and Qdrant ports to `127.0.0.1` so they are not exposed to the local network. The debugging and reindexing endpoints intentionally have no authentication and must remain local unless authentication, authorization, rate limiting, and production monitoring are added.
+
+Keep real provider credentials only in `.env`. The file is ignored by Git; `.env.example` contains no secret. Never place API keys in source files, workshop documents, screenshots, issue reports, or chat transcripts. If a key is exposed, revoke and replace it immediately.
+
 ## Project map
 
 ```text
