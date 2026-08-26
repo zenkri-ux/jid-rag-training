@@ -1,0 +1,42 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Packaging and build output
+build/
+dist/
+*.egg-info/
+
+# Local databases and runtime state
+qdrant_storage/
+qdrant-data/
+*.log
+
+instructor/
+
+# Generated presentation and document artifacts
+_slides_work/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini

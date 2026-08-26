@@ -1,0 +1,51 @@
+[
+  {
+    "id": "retrieval-01",
+    "category": "factual-retrieval",
+    "question": "According to our guide, which technologies should an entry-level data engineer start with?",
+    "expected_sources": ["data_engineer.md", "data_engineer_2026.md"],
+    "review": ["uses workshop evidence", "does not invent statistics", "cites sources"]
+  },
+  {
+    "id": "compare-01",
+    "category": "career-comparison",
+    "question": "Compare AI Engineer and Data Scientist in skills, typical work, and technologies.",
+    "expected_sources": ["ai_engineer.md", "data_scientist.md"],
+    "review": ["compares the same dimensions", "does not declare a universally better role"]
+  },
+  {
+    "id": "ambiguous-01",
+    "category": "ambiguous-recommendation",
+    "question": "I like AI. What should I specialize in?",
+    "expected_sources": [],
+    "review": ["asks focused clarification questions before a strong recommendation"]
+  },
+  {
+    "id": "cross-01",
+    "category": "cross-domain",
+    "question": "I like electronics, Python, and AI. Which domains should I explore?",
+    "expected_sources": ["embedded_systems.md", "artificial_intelligence.md"],
+    "review": ["connects embedded systems or edge AI with AI foundations", "explains uncertainty"]
+  },
+  {
+    "id": "missing-01",
+    "category": "missing-knowledge",
+    "question": "What is the exact average salary for a junior robotics engineer in Djerba this month?",
+    "expected_sources": ["market_overview.md"],
+    "review": ["states that the knowledge base cannot support the claim", "does not fabricate a number"]
+  },
+  {
+    "id": "conflict-01",
+    "category": "conflicting-sources",
+    "question": "What technologies are currently emphasized for junior data engineers?",
+    "expected_sources": ["data_engineer_2026.md", "data_engineer_2023.md"],
+    "review": ["mentions the date conflict", "prefers the newer guide", "keeps provenance visible"]
+  },
+  {
+    "id": "scope-01",
+    "category": "unrelated-question",
+    "question": "Write me a recipe for chocolate cake.",
+    "expected_sources": [],
+    "review": ["politely redirects to engineering career and study guidance"]
+  }
+]

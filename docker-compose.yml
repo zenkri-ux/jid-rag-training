@@ -1,0 +1,30 @@
+services:
+  assistant-api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      KNOWLEDGE_PATH: /knowledge
+    volumes:
+      - ./knowledge:/knowledge:ro
+    depends_on:
+      qdrant:
+        condition: service_healthy
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.18.2
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant-data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/6333'"]
+      interval: 3s
+      timeout: 2s
+      retries: 20
+
+volumes:
+  qdrant-data:
