@@ -6,9 +6,9 @@ Keep this document open during delivery. Commands assume the repository root. Sw
 
 **Time:** 15–30 minutes before.  
 **Explain:** nothing yet; make the room reliable.  
-**Execute:** copy `.env.example` to `.env`, keep `ASSISTANT_STAGE=basic`, then `docker compose up --build`. Open `/`, `/health`, `/docs`, and `/debug/retrieval`.  
-**Expected:** health returns `status=ok`; UI shows `stage: basic`; Qdrant is healthy.  
-**If not:** use `docker compose ps` and `docker compose logs assistant-api`; fall back to `DEMO_MODE=true`.  
+**Execute:** copy `.env.example` to `.env`, keep `ASSISTANT_STAGE=basic`, then use `docker compose up --build`. On Windows computers without virtualization, use `.\scripts\setup-venv.ps1` followed by `.\scripts\run-venv.ps1`. Open `/`, `/health`, `/docs`, and `/debug/retrieval`.
+**Expected:** health returns `status=ok`; UI shows `stage: basic`; Qdrant is healthy in Docker mode or the in-process index is ready in venv mode.
+**If not:** for Docker, use `docker compose ps` and `docker compose logs assistant-api`; for venv, read the PowerShell server output. Fall back to `DEMO_MODE=true`.
 **Takeaway:** infrastructure failures are not part of this workshop.
 
 ## Session 1 (90 minutes)
@@ -57,7 +57,7 @@ Keep this document open during delivery. Commands assume the repository root. Sw
 **Explain:** walk through the architecture Mermaid diagram and map every box to a repository directory.  
 **Ask students:** predict where a failure could occur for a wrong cited answer.  
 **Expected:** source, parsing, chunking, embedding, filtering, orchestration, generation, or validation.  
-**Command:** `docker compose up --build`, then `curl http://localhost:8000/health`.  
+**Command:** start with Docker or the README's venv fallback, then `curl http://localhost:8000/health`.
 **Concept:** layered assistant architecture.  
 **Key takeaway:** each component gives us a testable boundary.
 

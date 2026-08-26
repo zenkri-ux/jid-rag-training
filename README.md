@@ -5,11 +5,11 @@ A small workshop application for learning how modern AI assistants are engineere
 ## Requirements
 
 - Git
-- Docker Desktop (or Docker Engine with Compose v2)
+- Docker Desktop (or Docker Engine with Compose v2), **or Python 3.11+**
 - 4 GB free memory recommended
 - Optional: an API key for an OpenAI-compatible provider
 
-## Setup
+## Setup with Docker
 
 ```bash
 git clone <repository-url>
@@ -32,6 +32,27 @@ Open <http://localhost:8000>. Verify the API:
 ```bash
 curl http://localhost:8000/health
 ```
+
+## Setup without virtualization (Windows)
+
+Docker is optional. Participants whose computers do not support virtualization can run the same workshop app in a Python virtual environment. This mode uses an in-process knowledge index, so Qdrant and Docker are not required.
+
+From PowerShell in the repository root:
+
+```powershell
+.\scripts\setup-venv.ps1
+.\scripts\run-venv.ps1
+```
+
+If Windows blocks local PowerShell scripts, allow them for only the current terminal and retry:
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+```
+
+The setup script also creates `.env` from `.env.example` when it is missing. Then open <http://localhost:8000>. Stop the server with `Ctrl+C`. Run `setup-venv.ps1` only once; use `run-venv.ps1` for later sessions.
+
+The virtual-environment launcher sets `QDRANT_URL=memory://` and points `KNOWLEDGE_PATH` at the repository's `knowledge` directory for the current process only. Existing `.env` settings— including demo mode and optional provider credentials—continue to apply. Restarting the app rebuilds its in-memory index automatically.
 
 The interface is a responsive, build-free single page served directly by FastAPI. It includes guided prompts, workshop-stage visibility, conversation controls, source relevance indicators, and an evidence inspector without adding a frontend container or JavaScript toolchain.
 

@@ -18,10 +18,10 @@ class Settings(BaseSettings):
     top_k: int = 5
     chunk_size: int = 900
     chunk_overlap: int = 120
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # Support both Docker's /app working directory and local runs from backend/.
+    model_config = SettingsConfigDict(env_file=(".env", "../.env"), extra="ignore")
 
 
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
-

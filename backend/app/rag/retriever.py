@@ -1,3 +1,4 @@
+import math
 import uuid
 from typing import Any
 
@@ -11,10 +12,19 @@ class QdrantRetriever:
     def __init__(self, settings: Settings, embeddings: EmbeddingClient):
         self.settings = settings
         self.embeddings = embeddings
+        self.in_memory = settings.qdrant_url.lower().startswith("memory://")
+        self._points: list[dict[str, Any]] = []
         self.base = f"{settings.qdrant_url.rstrip('/')}/collections/{settings.collection_name}"
 
     async def index(self, chunks: list[dict[str, Any]]) -> int:
         vectors = await self.embeddings.embed([chunk["text"] for chunk in chunks])
+        if self.in_memory:
+            self._points = [
+                {"vector": vector, "payload": {**chunk["metadata"], "text": chunk["text"]}}
+                for chunk, vector in zip(chunks, vectors)
+            ]
+            return len(self._points)
+
         async with httpx.AsyncClient(timeout=90) as client:
             await client.delete(self.base)
             create = await client.put(self.base, json={"vectors": {"size": len(vectors[0]), "distance": "Cosine"}})
@@ -31,6 +41,18 @@ class QdrantRetriever:
 
     async def search(self, query: str, limit: int | None = None, filters: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         vector = (await self.embeddings.embed([query]))[0]
+        if self.in_memory:
+            matches = [
+                {
+                    "score": self._cosine_similarity(vector, point["vector"]),
+                    **point["payload"],
+                }
+                for point in self._points
+                if not filters or all(point["payload"].get(key) == value for key, value in filters.items())
+            ]
+            matches.sort(key=lambda item: item["score"], reverse=True)
+            return matches[:limit or self.settings.top_k]
+
         body: dict[str, Any] = {"query": vector, "limit": limit or self.settings.top_k, "with_payload": True}
         if filters:
             body["filter"] = {"must": [{"key": key, "match": {"value": value}} for key, value in filters.items()]}
@@ -40,3 +62,11 @@ class QdrantRetriever:
                 return []
             response.raise_for_status()
         return [{"score": hit["score"], **hit["payload"]} for hit in response.json()["result"]["points"]]
+
+    @staticmethod
+    def _cosine_similarity(left: list[float], right: list[float]) -> float:
+        numerator = sum(a * b for a, b in zip(left, right))
+        left_norm = math.sqrt(sum(value * value for value in left))
+        right_norm = math.sqrt(sum(value * value for value in right))
+        denominator = left_norm * right_norm
+        return numerator / denominator if denominator else 0.0

@@ -30,6 +30,13 @@ When an answer is wrong, ask: Was the fact in the documents? Was it chunked clea
 
 ## Useful commands
 
+Start with Docker, or use the Windows virtual-environment fallback when virtualization is unavailable:
+
+```powershell
+.\scripts\setup-venv.ps1  # first run only
+.\scripts\run-venv.ps1
+```
+
 ```bash
 curl http://localhost:8000/health
 curl -X POST http://localhost:8000/knowledge/reindex
@@ -37,3 +44,4 @@ curl "http://localhost:8000/debug/retrieval?q=hardware%20and%20programming"
 docker compose logs -f assistant-api
 ```
 
+`docker compose logs` applies only to the Docker setup. In venv mode, server logs appear directly in the PowerShell window.
