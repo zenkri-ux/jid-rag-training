@@ -37,25 +37,55 @@ curl http://localhost:8000/health
 
 Docker is optional. Participants whose computers do not support virtualization can run the same workshop app in a Python virtual environment. This mode uses an in-process knowledge index, so Qdrant and Docker are not required.
 
-Install Python 3.11 or newer first and select **Add Python to PATH** during installation. Then open **Windows PowerShell** (not Command Prompt), change to the cloned repository directory, and run:
+Install Python 3.11 or newer first and select **Add Python to PATH** during installation. Python includes `venv`; it does not need to be installed separately.
+
+### Manual PowerShell setup
+
+Open **Windows PowerShell** (not Command Prompt), change to the cloned repository directory, and run each command separately:
 
 ```powershell
 cd "C:\path\to\jid-rag-training"
+if (!(Test-Path .env)) { Copy-Item .env.example .env }
+py -3 -m venv backend\.venv
 Set-ExecutionPolicy -Scope Process Bypass
-.\scripts\setup-venv.ps1
-.\scripts\run-venv.ps1
+.\backend\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r backend\requirements.txt
+$env:QDRANT_URL = "memory://"
+$env:KNOWLEDGE_PATH = (Resolve-Path .\knowledge).Path
+Set-Location backend
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-`Set-ExecutionPolicy -Scope Process Bypass` applies only to the current PowerShell window; it does not permanently change the computer's execution policy. The setup script creates `.env` from `.env.example` when needed, creates `backend\.venv`, and installs the required packages.
+If `py` is not recognized but `python` works, replace `py -3 -m venv backend\.venv` with:
 
-Then open <http://localhost:8000>. Stop the server with `Ctrl+C`. For later sessions, open PowerShell in the repository and run only:
+```powershell
+python -m venv backend\.venv
+```
+
+`Set-ExecutionPolicy -Scope Process Bypass` applies only to the current PowerShell window; it does not permanently change the computer's execution policy. After Uvicorn starts, open <http://localhost:8000>. Stop the server with `Ctrl+C`.
+
+For later sessions, open PowerShell in the repository root and run:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass
+.\backend\.venv\Scripts\Activate.ps1
+$env:QDRANT_URL = "memory://"
+$env:KNOWLEDGE_PATH = (Resolve-Path .\knowledge).Path
+Set-Location backend
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+### Helper scripts
+
+The repository also provides scripts that automate the same steps:
+
+```powershell
+.\scripts\setup-venv.ps1  # first session only
 .\scripts\run-venv.ps1
 ```
 
-The virtual-environment launcher sets `QDRANT_URL=memory://` and points `KNOWLEDGE_PATH` at the repository's `knowledge` directory for the current process only. Existing `.env` settings— including demo mode and optional provider credentials—continue to apply. Restarting the app rebuilds its in-memory index automatically.
+The environment variables select the in-process knowledge index and point it at the repository's `knowledge` directory for the current PowerShell process only. Existing `.env` settings—including demo mode and optional provider credentials—continue to apply. Restarting the app rebuilds its in-memory index automatically.
 
 The interface is a responsive, build-free single page served directly by FastAPI. It includes guided prompts, workshop-stage visibility, conversation controls, source relevance indicators, and an evidence inspector without adding a frontend container or JavaScript toolchain.
 
